@@ -1,11 +1,1418 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Demian & Kosmach — Menu</title>
+  
+  <!-- Фавикон (иконка вкладки) с логотипом DK в золотом цвете -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='%23d4af37' stroke-width='6'/%3E%3Ctext x='50' y='62' font-family='Georgia, serif' font-size='35' font-weight='bold' fill='%23fdf6c7' text-anchor='middle'%3EDK%3C/text%3E%3C/svg%3E">
+  
+  <!-- Подключение красивых шрифтов Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Иконки FontAwesome для красоты -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Библиотека QRious для генерации QR-кодов -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+  <style>
+    /* Базовые стили в стиле оригинального меню */
+    :root {
+      --bg-color: #121212;
+      --card-bg: #181818;
+      --gold-dark: #aa7c11;
+      --gold-mid: #d4af37;
+      --gold-light: #fdf6c7;
+      --gold-bright: #ffdf00;
+      --text-color: #e0e0e0;
+      --text-muted: #a0a0a0;
+      --border-color: #2b2b2b;
+      --accent-gold: linear-gradient(135deg, #aa7c11 0%, #fdf6c7 30%, #d4af37 70%, #ffdf00 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    /* Фоновая текстура имитирующая матовую доску */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(20, 20, 20, 0.4) 0%, rgba(5, 5, 5, 0.9) 100%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.015'/%3E%3C/svg%3E");
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Контейнер приложения */
+    .app-container {
+      width: 100%;
+      max-width: 550px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      padding-bottom: 80px;
+    }
+
+    /* Шапка с выбором языка */
+    header {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 24px;
+      z-index: 100;
+    }
+
+    /* Языковой переключатель (Кастомный Селект) */
+    .lang-switcher {
+      position: relative;
+      font-size: 14px;
+      user-select: none;
+    }
+
+    .lang-selected {
+      background: rgba(24, 24, 24, 0.9);
+      border: 1px solid var(--gold-dark);
+      padding: 8px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      transition: all 0.3s ease;
+      color: var(--gold-light);
+    }
+
+    .lang-selected:hover, .lang-selected:active {
+      border-color: var(--gold-bright);
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.2);
+    }
+
+    .lang-selected i {
+      font-size: 10px;
+      transition: transform 0.3s ease;
+      color: var(--gold-mid);
+    }
+
+    .lang-selected.open i {
+      transform: rotate(180deg);
+    }
+
+    .lang-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: rgba(20, 20, 20, 0.98);
+      border: 1px solid var(--gold-dark);
+      border-radius: 16px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      z-index: 110;
+      width: 180px;
+      backdrop-filter: blur(10px);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .lang-dropdown.show {
+      display: flex;
+    }
+
+    .lang-option {
+      padding: 10px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.2s, color 0.2s;
+      color: var(--text-color);
+      font-weight: 400;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .lang-option:last-child {
+      border-bottom: none;
+    }
+
+    .lang-option:hover, .lang-option.active {
+      background: rgba(212, 175, 55, 0.15);
+      color: var(--gold-light);
+    }
+
+    .lang-flag {
+      font-size: 16px;
+      display: inline-block;
+      width: 22px;
+      text-align: center;
+    }
+
+    /* Блок Логотипа */
+    .brand-logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .brand-logo-svg {
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+      margin-bottom: 14px;
+      animation: logoPulse 4s infinite ease-in-out;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    .brand-name {
+      font-family: 'Cinzel', serif;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      background: var(--accent-gold);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    }
+
+    /* Разделительная линия под брендом */
+    .brand-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 140px;
+      margin: 4px auto 14px auto;
+    }
+
+    .brand-divider-line {
+      height: 1px;
+      background: var(--gold-dark);
+      flex-grow: 1;
+      opacity: 0.7;
+    }
+
+    .brand-divider-dot {
+      width: 4px;
+      height: 4px;
+      background-color: var(--gold-mid);
+      transform: rotate(45deg);
+    }
+
+    /* Месседж автоматического определения языка */
+    .auto-lang-alert {
+      font-size: 11px;
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      color: var(--gold-light);
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    /* Сетка и Категории меню */
+    .menu-section {
+      width: 100%;
+      background: rgba(24, 24, 24, 0.8);
+      border: 1.5px solid var(--gold-dark);
+      border-radius: 20px;
+      margin-bottom: 30px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    /* Внутренняя золотая рамка */
+    .menu-section::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      right: 4px;
+      bottom: 4px;
+      border: 0.5px solid rgba(212, 175, 55, 0.25);
+      border-radius: 16px;
+      pointer-events: none;
+    }
+
+    .menu-section-header {
+      padding: 20px 20px 10px 20px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .menu-section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--gold-light);
+      text-transform: uppercase;
+      display: inline-block;
+      position: relative;
+      padding-bottom: 6px;
+    }
+
+    .menu-section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 20%;
+      width: 60%;
+      height: 1px;
+      background: var(--accent-gold);
+    }
+
+    .menu-section-content {
+      padding: 14px 20px 20px 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Пункт меню */
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .menu-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .menu-item-info {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      padding-right: 12px;
+    }
+
+    .menu-item-header {
+      display: flex;
+      align-items: baseline;
+    }
+
+    .menu-item-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-color);
+      letter-spacing: 0.5px;
+      background: var(--card-bg);
+      padding-right: 6px;
+      z-index: 2;
+    }
+
+    .menu-item-dots {
+      flex-grow: 1;
+      border-bottom: 1px dotted rgba(212, 175, 55, 0.3);
+      position: relative;
+      top: -4px;
+      z-index: 1;
+    }
+
+    .menu-item-price {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gold-mid);
+      background: var(--card-bg);
+      padding-left: 6px;
+      z-index: 2;
+      white-space: nowrap;
+    }
+
+    .menu-item-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    /* Футер */
+    footer {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 10px;
+      padding: 20px 0 30px 0;
+      border-top: 1px solid rgba(212, 175, 55, 0.15);
+      text-align: center;
+    }
+
+    .footer-anchor-svg {
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+
+    .footer-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    /* Плавающая кнопка для вызова QR-кода */
+    .qr-float-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: var(--accent-gold);
+      border: none;
+      color: #121212;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(212,175,55,0.4);
+      cursor: pointer;
+      z-index: 90;
+      transition: all 0.3s ease;
+      animation: floatPulse 2s infinite ease-in-out;
+    }
+
+    .qr-float-btn:hover, .qr-float-btn:active {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(212,175,55,0.6);
+    }
+
+    @keyframes floatPulse {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    /* Модальное окно QR-кода */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: #1c1c1c;
+      border: 2px solid var(--gold-dark);
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      position: relative;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.show .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--gold-light);
+    }
+
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      color: var(--gold-light);
+      margin-bottom: 8px;
+    }
+
+    .modal-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* Блок для генерации QR-кода */
+    .qr-container {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 16px;
+      display: inline-block;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    #qr-code-canvas {
+      display: block;
+    }
+
+    .qr-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .btn-gold {
+      background: var(--accent-gold);
+      color: #121212;
+    }
+
+    .btn-gold:hover, .btn-gold:active {
+      box-shadow: 0 4px 15px rgba(212,175,55,0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: var(--gold-light);
+    }
+
+    .btn-outline:hover, .btn-outline:active {
+      background: rgba(212, 175, 55, 0.08);
+      border-color: var(--gold-mid);
+    }
+
+    /* Классы для анимации появления позиций меню */
+    .animate-item {
+      opacity: 0;
+      transform: translateY(12px);
+      animation: itemSlideIn 0.4s forwards ease-out;
+    }
+
+    @keyframes itemSlideIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* СТИЛИ ПЕЧАТИ (Особые стили, чтобы владелец мог нажать Print в браузере и получить готовый постер!) */
+    @media print {
+      body {
+        background-color: transparent !important;
+        background-image: none !important;
+        color: #000000 !important;
+        padding: 0 !important;
+      }
+      body::before {
+        display: none !important;
+      }
+      .app-container {
+        display: none !important;
+      }
+      .qr-float-btn {
+        display: none !important;
+      }
+      .modal-overlay {
+        position: absolute !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
+        display: block !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 100% !important;
+        height: auto !important;
+        top: 0 !important;
+        left: 0 !important;
+        padding: 0 !important;
+      }
+      .modal-card {
+        border: none !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 40px !important;
+        background: transparent !important;
+        transform: none !important;
+      }
+      .modal-close-btn, .qr-actions {
+        display: none !important;
+      }
+      .modal-title {
+        color: #000000 !important;
+        font-size: 28px !important;
+        margin-bottom: 12px !important;
+      }
+      .modal-subtitle {
+        color: #555555 !important;
+        font-size: 16px !important;
+        margin-bottom: 40px !important;
+      }
+      .qr-container {
+        border: 2px solid #000 !important;
+        box-shadow: none !important;
+        padding: 24px !important;
+        margin-bottom: 40px !important;
+      }
+      /* Красивый постер для печати на столы */
+      .print-poster-only {
+        display: block !important;
+        font-family: 'Cinzel', serif;
+        text-align: center;
+        margin-top: 40px;
+      }
+      .print-languages-list {
+        display: flex !important;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 20px;
+        color: #333;
+        font-family: 'Montserrat', sans-serif;
+      }
+    }
+
+    .print-poster-only {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    <h1>Hello World</h1>
+
+  <div class="app-container">
+    
+    <!-- Переключатель языка -->
+    <header>
+      <div class="lang-switcher" id="langSwitcher">
+        <div class="lang-selected" id="langSelected">
+          <span class="lang-flag" id="selectedFlag">🇩🇰</span>
+          <span id="selectedLabel">Dansk</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="lang-dropdown" id="langDropdown">
+          <div class="lang-option" data-lang="da">
+            <span class="lang-flag">🇩🇰</span>Dansk
+          </div>
+          <div class="lang-option" data-lang="en">
+            <span class="lang-flag">🇬🇧</span>English
+          </div>
+          <div class="lang-option" data-lang="ru">
+            <span class="lang-flag">🇷🇺</span>Русский
+          </div>
+          <div class="lang-option" data-lang="uk">
+            <span class="lang-flag">🇺🇦</span>Українська
+          </div>
+          <div class="lang-option" data-lang="de">
+            <span class="lang-flag">🇩🇪</span>Deutsch
+          </div>
+          <div class="lang-option" data-lang="es">
+            <span class="lang-flag">🇪🇸</span>Español
+          </div>
+          <div class="lang-option" data-lang="ja">
+            <span class="lang-flag">🇯🇵</span>日本語
+          </div>
+          <div class="lang-option" data-lang="no">
+            <span class="lang-flag">🇳🇴</span>Norsk
+          </div>
+          <div class="lang-option" data-lang="sv">
+            <span class="lang-flag">🇸🇪</span>Svenska
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Оповещение об автоматическом определении языка -->
+    <div class="auto-lang-alert" id="autoLangAlert">
+      <i class="fa-solid fa-circle-info"></i>
+      <span id="autoLangMessage">Auto-detected language based on device settings</span>
+    </div>
+
+    <!-- Логотип и Бренд -->
+    <div class="brand-logo-container">
+      <!-- Элегантный SVG логотип, точно как на оригинальной вывеске -->
+      <svg class="brand-logo-svg" width="110" height="110" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="none" stroke="url(#gold-grad)" stroke-width="2.5" />
+        <circle cx="50" cy="50" r="41" fill="none" stroke="url(#gold-grad)" stroke-width="0.7" />
+        <text x="50" y="59" font-family="'Cinzel', 'Playfair Display', 'Georgia', serif" font-size="28" font-weight="700" fill="url(#gold-grad)" text-anchor="middle" letter-spacing="1">DK</text>
+        <defs>
+          <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#aa7c11" />
+            <stop offset="30%" stop-color="#fdf6c7" />
+            <stop offset="70%" stop-color="#d4af37" />
+            <stop offset="100%" stop-color="#ffdf00" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <h1 class="brand-name">Demian & Kosmach</h1>
+      <div class="brand-divider">
+        <div class="brand-divider-line"></div>
+        <div class="brand-divider-dot"></div>
+        <div class="brand-divider-line"></div>
+      </div>
+    </div>
+
+    <!-- Разделы Меню -->
+    <main id="menuContainer" style="width: 100%;"></main>
+
+    <!-- Подвал (Якорь и копирайт) -->
+    <footer>
+      <!-- Золотой якорь прямо из оригинала -->
+      <svg class="footer-anchor-svg" width="34" height="40" viewBox="0 0 100 120">
+        <path d="M 50 10 C 45 10 41 14 41 19 C 41 24 45 28 50 28 C 55 28 59 24 59 19 C 59 14 55 10 50 10 Z M 50 15 C 52 15 54 17 54 19 C 54 21 52 23 50 23 C 48 23 46 21 46 19 C 46 17 48 15 50 15 Z" fill="url(#gold-grad)"></path>
+        <rect x="47" y="28" width="6" height="50" fill="url(#gold-grad)"></rect>
+        <rect x="36" y="38" width="28" height="5" rx="2" fill="url(#gold-grad)"></rect>
+        <path d="M 50 110 C 25 110 13 88 12 70 C 12 65 16 61 20 61 C 24 61 27 64 28 68 C 29 80 37 92 50 92 C 63 92 71 80 72 68 C 73 64 76 61 80 61 C 84 61 88 65 88 70 C 87 88 75 110 50 110 Z" fill="url(#gold-grad)"></path>
+        <path d="M 6 72 L 18 72 L 12 60 L 6 72 Z" fill="url(#gold-grad)"></path>
+        <path d="M 82 72 L 94 72 L 88 60 L 82 72 Z" fill="url(#gold-grad)"></path>
+      </svg>
+      <div id="footerText" class="footer-text">DEMIAN & KOSMACH © 2026</div>
+    </footer>
+
+  </div>
+
+  <!-- Плавающая кнопка для вызова QR-кода -->
+  <button class="qr-float-btn" id="qrFloatBtn" title="Get Menu QR-Code">
+    <i class="fa-solid fa-qrcode"></i>
+  </button>
+
+  <!-- Модальное окно QR-кода -->
+  <div class="modal-overlay" id="qrModal">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="qrCloseBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      
+      <h3 class="modal-title" id="qrModalTitle">Translate our Menu!</h3>
+      <p class="modal-subtitle" id="qrModalSubtitle">Scanning this QR code will automatically load the menu in your language.</p>
+      
+      <div class="qr-container">
+        <canvas id="qr-code-canvas"></canvas>
+      </div>
+
+      <div class="qr-actions">
+        <button class="btn btn-gold" id="btnPrintQR">
+          <i class="fa-solid fa-print"></i> <span id="btnPrintText">Print Poster for Tables</span>
+        </button>
+        <button class="btn btn-outline" id="btnDownloadQR">
+          <i class="fa-solid fa-download"></i> <span id="btnDownloadText">Download Image</span>
+        </button>
+      </div>
+
+      <!-- Элементы только для печатной версии постера -->
+      <div class="print-poster-only">
+        <div style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: bold; margin-bottom: 8px;">
+          DEMIAN & KOSMACH
+        </div>
+        <div style="letter-spacing: 2px; font-size: 14px; text-transform: uppercase; margin-bottom: 25px; color: #555;">
+          sushi-bar & cafe
+        </div>
+        <div style="border-top: 1px solid #ddd; width: 80px; margin: 0 auto 20px auto;"></div>
+        <div style="font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 600; line-height: 1.5; color: #111;">
+          Scan for Menu in Your Language
+        </div>
+        <div style="font-family: 'Montserrat', sans-serif; font-size: 13px; color: #666; margin-top: 6px;">
+          Dansk • English • Русский • Українська • Deutsch • Español • 日本語 • Norsk • Svenska
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Локализации и Интерактива -->
+  <script>
+    // Переводы интерфейса и элементов меню
+    const dictionary = {
+      da: {
+        autoLangMsg: "Sproget blev automatisk indstillet til dansk baseret på din browsers indstillinger.",
+        qrTitle: "Oversæt vores menu!",
+        qrSubtitle: "Scan denne QR-kode for at åbne menuen på dit eget sprog.",
+        btnPrint: "Udskriv plakat til borde",
+        btnDownload: "Download QR-kode",
+        footerCopyright: "DEMIAN & KOSMACH © 2026",
+        menuTitle: "Kort over drikkevarer",
+        currency: "kr.",
+        categories: {
+          fadøl: "Fadøl",
+          dåse: "Dåse",
+          vin: "Vin",
+          kildevand: "Kildevand",
+          shots: "Shots",
+          drinks: "Drinks"
+        },
+        items: {
+          fadol_pilsner: { name: "Fadøl Pilsner", desc: "Forfriskende og klassisk koldt fadøl" },
+          fadol_classic: { name: "Fadøl Classic", desc: "Mørkere pilsnerøl med fyldig smag" },
+          ipa: { name: "IPA", desc: "Indisk bleg øl med markant humlearoma" },
+          mango_gin_fad: { name: "Mango Gin (Tapped)", desc: "Unik gin og mango cocktail fra hanen" },
+          aperol_spritz: { name: "Aperol Spritz", desc: "Italiensk klassiker med Aperol, prosecco og danskvand" },
+          somersby: { name: "Somersby", desc: "Sød og frugtig æblecider på flaske" },
+          dase_ol: { name: "Dåse øl", desc: "Udvalg af kolde dåseøl" },
+          alkoholfri: { name: "Alkoholfri øl/cider", desc: "Forfriskende øl eller cider uden alkohol" },
+          vin_flaske: { name: "Vin Flaske", desc: "Husets udsøgte vin (rød eller hvid)" },
+          vin_glas: { name: "Vin Glas", desc: "Et koldt eller fyldigt glas af husets vin" },
+          kildevand_50: { name: "Kildevand 50 cl.", desc: "Koldt naturligt kildevand" },
+          sodavand: { name: "Sodavand", desc: "Vælg mellem Coca-Cola, Fanta, Sprite eller Zero" },
+          shot_2: { name: "Shot 2 cl.", desc: "Valgfri spiritus eller rygende shot" },
+          underberg_2: { name: "Underberg 2 cl.", desc: "Traditionel tysk urtebitter" },
+          cocktail_4: { name: "Cocktail 4 cl.", desc: "Klassiske cocktails lavet på bestilling" },
+          mango_gin_cocktail: { name: "Mango Gin (Cocktail)", desc: "Premium gin rystet med mangopuré og tonic" },
+          gin_tonic: { name: "Gin Tonic", desc: "Klassisk London Dry gin med sprød tonic og lime" },
+          jack_daniels: { name: "Jack Daniels 5 cl.", desc: "Original Tennessee Sour Mash Whiskey" }
+        }
+      },
+      en: {
+        autoLangMsg: "Language automatically set to English based on your browser settings.",
+        qrTitle: "Translate our Menu!",
+        qrSubtitle: "Scan this QR code to load the menu in your native language.",
+        btnPrint: "Print Table Poster",
+        btnDownload: "Download QR Image",
+        footerCopyright: "DEMIAN & KOSMACH © 2026",
+        menuTitle: "Drinks Menu",
+        currency: "kr.",
+        categories: {
+          fadøl: "Draft Beer",
+          dåse: "Canned Beer & Cider",
+          vin: "Wine",
+          kildevand: "Water & Soft Drinks",
+          shots: "Shots",
+          drinks: "Cocktails & Drinks"
+        },
+        items: {
+          fadol_pilsner: { name: "Draft Pilsner", desc: "Crisp and refreshing cold draft beer" },
+          fadol_classic: { name: "Draft Classic", desc: "Maltier draft beer with deep golden color and rich flavour" },
+          ipa: { name: "IPA", desc: "India Pale Ale with intense hop aroma and citrus notes" },
+          mango_gin_fad: { name: "Mango Gin (Draft)", desc: "Unique sweet gin & mango fusion on tap" },
+          aperol_spritz: { name: "Aperol Spritz", desc: "Classic Italian aperitif with Aperol, prosecco and soda water" },
+          somersby: { name: "Somersby Cider", desc: "Sweet, refreshing apple cider served ice-cold" },
+          dase_ol: { name: "Canned Beer", desc: "Selection of ice-cold canned beers" },
+          alkoholfri: { name: "Non-Alcoholic Beer/Cider", desc: "Alcohol-free refreshing alternative with full taste" },
+          vin_flaske: { name: "Bottle of Wine", desc: "Our house selection of premium red or white wine" },
+          vin_glas: { name: "Glass of Wine", desc: "A satisfying glass of house red or white wine" },
+          kildevand_50: { name: "Spring Water 50 cl.", desc: "Still, refreshing natural spring water" },
+          sodavand: { name: "Soda / Soft Drink", desc: "Choice of Coca-Cola, Fanta, Sprite or Zero" },
+          shot_2: { name: "Shot 2 cl.", desc: "Choice of premium liquor or party shot" },
+          underberg_2: { name: "Underberg 2 cl.", desc: "Traditional German herbal bitters" },
+          cocktail_4: { name: "Cocktail 4 cl.", desc: "Freshly mixed classic cocktails" },
+          mango_gin_cocktail: { name: "Mango Gin (Cocktail)", desc: "Premium gin mixed with ripe mango purée and tonic" },
+          gin_tonic: { name: "Gin Tonic", desc: "Dry gin paired with premium tonic water and fresh lime" },
+          jack_daniels: { name: "Jack Daniels 5 cl.", desc: "Original Tennessee sour mash whiskey served over ice" }
+        }
+      },
+      ru: {
+        autoLangMsg: "Язык автоматически установлен на русский в соответствии с настройками вашего телефона.",
+        qrTitle: "Перевод меню на русский!",
+        qrSubtitle: "Сканируйте этот QR-код, чтобы просмотреть меню на вашем родном языке.",
+        btnPrint: "Распечатать флаер на столы",
+        btnDownload: "Скачать изображение QR",
+        footerCopyright: "DEMIAN & KOSMACH © 2026",
+        menuTitle: "Карта напитков",
+        currency: "крон",
+        categories: {
+          fadøl: "Разливное пиво",
+          dåse: "Пиво в банках и сидр",
+          vin: "Вино",
+          kildevand: "Вода и прохладительные напитки",
+          shots: "Шоты",
+          drinks: "Коктейли и напитки"
+        },
+        items: {
+          fadol_pilsner: { name: "Разливной Пилснер", desc: "Освежающее и классическое холодное разливное пиво" },
+          fadol_classic: { name: "Разливной Классик", desc: "Более плотное янтарное пиво с богатым солодовым вкусом" },
+          ipa: { name: "IPA", desc: "Интенсивный индийский бледный эль с выраженным ароматом хмеля" },
+          mango_gin_fad: { name: "Манго Джин (из крана)", desc: "Фирменный разливной коктейль на основе джина и манго" },
+          aperol_spritz: { name: "Апероль Спритц", desc: "Легендарный итальянский коктейль с Аперолем, просекко и содовой" },
+          somersby: { name: "Сомерсби сидр", desc: "Сладкий и ароматный яблочный сидр" },
+          dase_ol: { name: "Пиво в банке", desc: "Ассортимент охлажденного баночного пива" },
+          alkoholfri: { name: "Безалкогольное пиво/сидр", desc: "Освежающая альтернатива без градуса, сохранившая полный вкус" },
+          vin_flaske: { name: "Бутылка вина", desc: "Наш выбор отборного красного или белого вина" },
+          vin_glas: { name: "Бокал вина", desc: "Бокал изысканного домашнего красного или белого вина" },
+          kildevand_50: { name: "Родниковая вода 50 мл", desc: "Чистая негазированная природная вода" },
+          sodavand: { name: "Газировка / Лимонад", desc: "На выбор: Coca-Cola, Fanta, Sprite или Zero" },
+          shot_2: { name: "Шот 20 мл", desc: "Крепкий алкоголь или ликер на ваш выбор" },
+          underberg_2: { name: "Ундерберг 20 мл", desc: "Традиционный немецкий травяной биттер для пищеварения" },
+          cocktail_4: { name: "Коктейль 40 мл", desc: "Классические коктейли, смешанные профессиональным барменом" },
+          mango_gin_cocktail: { name: "Манго Джин (коктейль)", desc: "Премиальный джин, взбитый с пюре спелого манго и тоником" },
+          gin_tonic: { name: "Джин-тоник", desc: "Сухой джин с хрустящим тоником и долькой свежего лайма" },
+          jack_daniels: { name: "Джек Дэниэлс 50 мл", desc: "Легендарный теннессийский виски с мягким карамельным оттенком" }
+        }
+      },
+      uk: {
+        autoLangMsg: "Мову автоматично встановлено на українську відповідно до налаштувань вашого пристрою.",
+        qrTitle: "Переклад меню українською!",
+        qrSubtitle: "Скануйте цей QR-код, щоб відкрити меню вашою рідною мовою.",
+        btnPrint: "Роздрукувати флаєр на столи",
+        btnDownload: "Завантажити зображення QR",
+        footerCopyright: "DEMIAN & KOSMACH © 2026",
+        menuTitle: "Карта напоїв",
+        currency: "крон",
+        categories: {
+          fadøl: "Розливне пиво",
+          dåse: "Пиво в банках та сидр",
+          vin: "Вино",
+          kildevand: "Вода та безалкогольні напої",
+          shots: "Шоти",
+          drinks: "Коктейлі та напої"
+        },
+        items: {
+          fadol_pilsner: { name: "Розливний Пілснер", desc: "Класичне холодне розливне пиво з приємною гірчинкою" },
+          fadol_classic: { name: "Розливний Класік", desc: "Більш щільне пиво насиченого кольору з багатим солодовим смаком" },
+          ipa: { name: "IPA", desc: "Яскравий і ароматний індійський блідий ель з фруктовими нотами" },
+          mango_gin_fad: { name: "Манго Джин (з крана)", desc: "Ексклюзивний розливний коктейль з джином та манго" },
+          aperol_spritz: { name: "Апероль Спритц", desc: "Освіжаючий італійський аперитив з Аперолем, просекко та газованою водою" },
+          somersby: { name: "Сомерсбі сидр", desc: "Солодкий освіжаючий яблучний сидр напівсухий" },
+          dase_ol: { name: "Пиво у банці", desc: "Асортимент холодного баночного пива" },
+          alkoholfri: { name: "Безалкогольне пиво/сидр", desc: "Приємний смак пива або сидру абсолютно без алкоголю" },
+          vin_flaske: { name: "Пляшка вина", desc: "Ретельно підібране домашнє червоне або біле вино вищої якості" },
+          vin_glas: { name: "Келих вина", desc: "Келих сухого або напівсолодкого червоного / білого вина" },
+          kildevand_50: { name: "Джерельна вода 50 мл", desc: "Чиста негазована природна питна вода" },
+          sodavand: { name: "Газована вода / Лимонад", desc: "На вибір: Coca-Cola, Fanta, Sprite або Zero" },
+          shot_2: { name: "Шот 20 мл", desc: "Порція міцного напою або авторський шот на вибір" },
+          underberg_2: { name: "Ундерберг 20 мл", desc: "Знаменитий німецький трав'яний еліксир-дижестив" },
+          cocktail_4: { name: "Коктейль 40 мл", desc: "Улюблені закордонні коктейлі, приготовані за класичним рецептом" },
+          mango_gin_cocktail: { name: "Манго Джин (коктейль)", desc: "Джин преміумкласу зі стиглим пюре манго та прохолодним тоніком" },
+          gin_tonic: { name: "Джин-тонік", desc: "Свіже злиття сухого джину з фірмовим тоніком та лаймом" },
+          jack_daniels: { name: "Джек Деніелс 50 мл", desc: "Класичний американський теннессійський віскі, пом'якшений вугіллям" }
+        }
+      },
+      de: {
+        autoLangMsg: "Sprache basierend auf Ihren Browsereinstellungen automatisch auf Deutsch eingestellt.",
+        qrTitle: "Menü übersetzen!",
+        qrSubtitle: "Scannen Sie diesen QR-Code, um die Speisekarte in Ihrer Sprache anzuzeigen.",
+        btnPrint: "Plakat für Tische drucken",
+        btnDownload: "QR-Bild herunterladen",
+        footerCopyright: "DEMIAN & KOSMACH © 2026",
+        menuTitle: "Getränkekarte",
+        currency: "kr.",
+        categories: {
+          fadøl: "Bier vom Fass",
+          dåse: "Dosenbier & Cider",
+          vin: "Wein",
+          kildevand: "Wasser & Softdrinks",
+          shots: "Shots",
+          drinks: "Cocktails & Longdrinks"
+        },
+        items: {
+          fadol_pilsner: { name: "Pilsner vom Fass", desc: "Erfrischendes und klassisches kaltes Zapfbier" },
+          fadol_classic: { name: "Classic vom Fass", desc: "Dunkleres Pilsner mit vollmundigem Malzaroma" },
+          ipa: { name: "IPA", desc: "Kräftiges India Pale Ale mit ausgeprägter Hopfennote" },
+          mango_gin_fad: { name: "Mango Gin vom Fass", desc: "Einzigartige Gin- und Mango-Fusion direkt vom Hahn" },
+          aperol_spritz: { name: "Aperol Spritz", desc: "Italienischer Aperitif mit Aperol, Prosecco und Sodawasser" },
+          somersby: { name: "Somersby Cider", desc: "Süßer und fruchtiger Apfelwein eisgekühlt serviert" },
+          dase_ol: { name: "Dosenbier", desc: "Auswahl an eiskalten Bieren in der Dose" },
+          alkoholfri: { name: "Alkoholfreies Bier/Cider", desc: "Alkoholfreies Erfrischungsgetränk mit vollem Geschmack" },
+          vin_flaske: { name: "Flasche Wein", desc: "Unsere exquisite Hausauswahl (Rot- oder Weißwein)" },
+          vin_glas: { name: "Glas Wein", desc: "Ein reichhaltiges oder frisches Glas unseres Hausweins" },
+          kildevand_50: { name: "Quellwasser 50 cl", desc: "Kaltes stilles Quellwasser aus der Natur" },
+          sodavand: { name: "Limonade", desc: "Auswahl aus Coca-Cola, Fanta, Sprite oder Zero" },
+          shot_2: { name: "Shot 2 cl", desc: "Schnaps oder Kurzer nach Wahl" },
+          underberg_2: { name: "Underberg 2 cl", desc: "Traditioneller deutscher Kräuterbitter" },
+          cocktail_4: { name: "Cocktail 4 cl", desc: "Beliebte Cocktails, frisch für Sie zubereitet" },
+          mango_gin_cocktail: { name: "Mango Gin (Cocktail)", desc: "Premium-Gin geschüttelt mit Mango-Püree und Tonic" },
+          gin_tonic: { name: "Gin Tonic", desc: "Klassischer Dry Gin mit kühlem Tonic Water und Limettenscheibe" },
+          jack_daniels: { name: "Jack Daniels 5 cl", desc: "Original weicher Tennessee Sour Mash Whiskey" }
+        }
+      },
+      es: {
+        autoLangMsg: "Idioma configurado automáticamente en español según los ajustes de tu dispositivo.",
+        qrTitle: "¡Traduce nuestra carta!",
+        qrSubtitle: "Escanea este código QR para abrir el menú en tu idioma nativo.",
+        btnPrint: "Imprimir cartel para mesas",
+        btnDownload: "Descargar imagen QR",
+        footerCopyright: "DEMIAN & KOSMACH © 2026",
+        menuTitle: "Menú de Bebidas",
+        currency: "kr.",
+        categories: {
+          fadøl: "Cerveza de barril",
+          dåse: "Cerveza de lata y sidra",
+          vin: "Vino",
+          kildevand: "Agua y refrescos",
+          shots: "Chupitos",
+          drinks: "Cócteles y combinados"
+        },
+        items: {
+          fadol_pilsner: { name: "Pilsner de barril", desc: "Cerveza de barril helada, suave y refrescante" },
+          fadol_classic: { name: "Classic de barril", desc: "Cerveza lager oscura con un cuerpo y sabor a malta refinados" },
+          ipa: { name: "IPA", desc: "Cerveza artesanal de lúpulo intenso con notas cítricas" },
+          mango_gin_fad: { name: "Mango Gin de grifo", desc: "Cóctel único de ginebra y mango de barril" },
+          aperol_spritz: { name: "Aperol Spritz", desc: "Aperitivo clásico italiano elaborado con Aperol, prosecco y soda" },
+          somersby: { name: "Somersby Sidra", desc: "Sidra de manzana dulce y refrescante servida muy fría" },
+          dase_ol: { name: "Cerveza en lata", desc: "Nuestra selección de cervezas en lata bien frías" },
+          alkoholfri: { name: "Cerveza/Sidra sin alcohol", desc: "Bebida sin alcohol refrescante con todo el carácter" },
+          vin_flaske: { name: "Botella de vino", desc: "Nuestra excelente selección de vino de la casa tinto o blanco" },
+          vin_glas: { name: "Copa de vino", desc: "Una copa de nuestro vino de la casa perfectamente servida" },
+          kildevand_50: { name: "Agua mineral 50 cl", desc: "Agua de manantial natural y deliciosamente pura" },
+          sodavand: { name: "Refresco", desc: "Elegir entre Coca-Cola, Fanta, Sprite o Zero" },
+          shot_2: { name: "Chupito 2 cl", desc: "Un licor premium o chupito de la casa" },
+          underberg_2: { name: "Underberg 2 cl", desc: "Licor de hierbas tradicional alemán para la digestión" },
+          cocktail_4: { name: "Cóctel 4 cl", desc: "Sabrosos cócteles clásicos preparados al instante" },
+          mango_gin_cocktail: { name: "Mango Gin (Cóctel)", desc: "Ginebra fina mezclada con pulpa de mango selecta y tónica" },
+          gin_tonic: { name: "Gin Tonic", desc: "Ginebra seca combinada con tónica refrescante y lima" },
+          jack_daniels: { name: "Jack Daniels 5 cl", desc: "Icónico whiskey americano de filtrado muy suave" }
+        }
+      },
+      ja: {
+        autoLangMsg: "お使いのブラウザ設定に基づき、日本語に自動翻訳されました。",
+        qrTitle: "メニューを翻訳する！",
+        qrSubtitle: "このQRコードをスキャンすると、お客様の言語でメニューが表示されます。",
+        btnPrint: "テーブル用のポスターを印刷",
+        btnDownload: "QR画像をダウンロード",
+        footerCopyright: "DEMIAN & KOSMACH © 2026",
+        menuTitle: "ドリンクメニュー",
+        currency: "クローネ",
+        categories: {
+          fadøl: "生ビール（樽生）",
+          dåse: "缶ビール＆シードル",
+          vin: "ワイン",
+          kildevand: "お水＆ソフトドリンク",
+          shots: "ショット",
+          drinks: "カクテル＆ロングドリンク"
+        },
+        items: {
+          fadol_pilsner: { name: "ピルスナー（生）", desc: "キリッと冷えた、のどごし爽やかな定番の樽生ビール" },
+          fadol_classic: { name: "クラシック（生）", desc: "深いコクと芳醇なモルトの香りが際立つ琥珀色の生ビール" },
+          ipa: { name: "IPA", desc: "ホップの豊かな香りとしっかりとした苦味が特徴のインディア・ペールエール" },
+          mango_gin_fad: { name: "マンゴージン（タップ）", desc: "タップから注がれるジンと新鮮なマンゴーの美味しいフュージョン" },
+          aperol_spritz: { name: "アペロール・スプリッツ", desc: "アペロール、プロセッコ、ソーダを合わせたイタリアの定番スパークリングアペリティフ" },
+          somersby: { name: "サマーズビー・シードル", desc: "氷のように冷たく甘口なアップルシードル" },
+          dase_ol: { name: "缶ビール", desc: "キンキンに冷えた各種缶ビール" },
+          alkoholfri: { name: "ノンアルコール ビール/シードル", desc: "アルコールゼロでも豊かな本来の味わいを楽しめる一杯" },
+          vin_flaske: { name: "ボトルワイン", desc: "厳選したハウスワイン（赤・白）のフルボトル" },
+          vin_glas: { name: "グラスワイン", desc: "気軽にお楽しみいただけるハウスワイン（赤・白）のグラス" },
+          kildevand_50: { name: "湧水 50 cl", desc: "すっきりと澄んだ純粋なナチュラルミネラルウォーター" },
+          sodavand: { name: "炭酸飲料 / ジュース", desc: "コカ・コーラ、ファンタ、スプライト、コカ・コーラ・ゼロからお選びください" },
+          shot_2: { name: "ショット 2 cl.", desc: "お好みのプレミアムスピリッツをショットグラスで" },
+          underberg_2: { name: "ウンダーベルグ 2 cl.", desc: "ハーブの香りが効いたドイツの伝統的な薬草リキュール" },
+          cocktail_4: { name: "カクテル 4 cl.", desc: "バーテンダーがその場で仕上げる本格的な定番カクテル" },
+          mango_gin_cocktail: { name: "マンゴージン（カクテル）", desc: "上質なジンに特製マンゴーピューレとトニックをシェイク" },
+          gin_tonic: { name: "ジン・トニック", desc: "すっきり香るドライジンとプレミアムトニック、フレッシュライムのスライス" },
+          jack_daniels: { name: "ジャックダニエル 5 cl.", desc: "独自の製法で造られるテネシー・ウイスキー（オン・ザ・ロックなど）" }
+        }
+      },
+      no: {
+        autoLangMsg: "Språket ble automatisk satt til norsk basert på innstillingene på din enhet.",
+        qrTitle: "Oversett menyen vår!",
+        qrSubtitle: "Scan denne QR-koden for å se menyen på ditt eget språk.",
+        btnPrint: "Skriv ut plakat for bord",
+        btnDownload: "Last ned QR-bilde",
+        footerCopyright: "DEMIAN & KOSMACH © 2026",
+        menuTitle: "Drikkekart",
+        currency: "kr.",
+        categories: {
+          fadøl: "Fatøl",
+          dåse: "Boksøl & Sider",
+          vin: "Vin",
+          kildevand: "Kildevann & Mineralvann",
+          shots: "Shots",
+          drinks: "Cocktails & Drinker"
+        },
+        items: {
+          fadol_pilsner: { name: "Pilsner fatøl", desc: "Forfriskende og klassisk kaldt fatøl" },
+          fadol_classic: { name: "Classic fatøl", desc: "Mørkere pilsnerøl med rund og fyldig maltsmak" },
+          ipa: { name: "IPA", desc: "India Pale Ale med markant, fruktig humlearoma" },
+          mango_gin_fad: { name: "Mango Gin (Tapped)", desc: "Spennende fusion av gin og mango på kran" },
+          aperol_spritz: { name: "Aperol Spritz", desc: "Italiensk klassiker med Aperol, prosecco og sodavann" },
+          somersby: { name: "Somersby Sider", desc: "Søt og fruktig eplesider servert iskald" },
+          dase_ol: { name: "Boksøl", desc: "Utvalg av kalde øl på boks" },
+          alkoholfri: { name: "Alkoholfri øl/sider", desc: "Alkoholfritt alternativ med ekte, god smak" },
+          vin_flaske: { name: "Flaske vin", desc: "Husets utvalgte rødvin eller hvitvin på flaske" },
+          vin_glas: { name: "Glass vin", desc: "Et kaldt, nydelig glass av husets vin" },
+          kildevand_50: { name: "Kildevann 50 cl.", desc: "Revitaliserende og kaldt mineralvann" },
+          sodavand: { name: "Brus", desc: "Velg mellom Coca-Cola, Fanta, Sprite eller Zero" },
+          shot_2: { name: "Shot 2 cl.", desc: "Valgfri brennevin eller shot" },
+          underberg_2: { name: "Underberg 2 cl.", desc: "Tradisjonell tysk urtebitter" },
+          cocktail_4: { name: "Cocktail 4 cl.", desc: "Klassiske cocktails mikset ved bestilling" },
+          mango_gin_cocktail: { name: "Mango Gin (Cocktail)", desc: "Førsteklasses gin ristet med fyldig mangopuré og tonic" },
+          gin_tonic: { name: "Gin Tonic", desc: "Klassisk tørr gin parret med frisk tonic og lime" },
+          jack_daniels: { name: "Jack Daniels 5 cl.", desc: "Original myk tennessee sour mash whiskey" }
+        }
+      },
+      sv: {
+        autoLangMsg: "Språket har automatiskt ställts in till svenska baserat på dina inställningar.",
+        qrTitle: "Översätt vår meny!",
+        qrSubtitle: "Skanna den här QR-koden för att visa menyn på ditt språk.",
+        btnPrint: "Skriv ut bordsplakat",
+        btnDownload: "Ladda ner QR-bild",
+        footerCopyright: "DEMIAN & KOSMACH © 2026",
+        menuTitle: "Drickesmeny",
+        currency: "kr.",
+        categories: {
+          fadøl: "Fatöl",
+          dåse: "Burköl & Cider",
+          vin: "Vin",
+          kildevand: "Källvatten & Läsk",
+          shots: "Shots",
+          drinks: "Drinkar & Cocktails"
+        },
+        items: {
+          fadol_pilsner: { name: "Pilsner fatöl", desc: "Klassisk och uppfriskande kall fatöl" },
+          fadol_classic: { name: "Classic fatöl", desc: "Mörkare lageröl med fyllig smak och maltig ton" },
+          ipa: { name: "IPA", desc: "Kaxig India Pale Ale med rejäl humlearom" },
+          mango_gin_fad: { name: "Mango Gin (Tapped)", desc: "Enastående gin & mango cocktail direkt från kranen" },
+          aperol_spritz: { name: "Aperol Spritz", desc: "Italiensk klassiker med Aperol, prosecco och sodavatten" },
+          somersby: { name: "Somersby Sider", desc: "Söt och bärig äppelcider serveras iskall" },
+          dase_ol: { name: "Burköl", desc: "Ett urval av kalla burköl" },
+          alkoholfri: { name: "Alkoholfri öl/cider", desc: "Skönt läskande och smakrik dryck utan alkohol" },
+          vin_flaske: { name: "Flaska vin", desc: "Husets utvalda röda eller vita vin" },
+          vin_glas: { name: "Glas vin", desc: "Ett välsmakande glas av husets röda eller vita vin" },
+          kildevand_50: { name: "Källvatten 50 cl.", desc: "Friskt naturligt källvatten" },
+          sodavand: { name: "Läsk", desc: "Välj mellan Coca-Cola, Fanta, Sprite eller Zero" },
+          shot_2: { name: "Shot 2 cl.", desc: "Välj snaps eller shot ur vårt barsortiment" },
+          underberg_2: { name: "Underberg 2 cl.", desc: "Klassisk tysk örtbitter" },
+          cocktail_4: { name: "Cocktail 4 cl.", desc: "Välblandade drinkar och klassiska cocktails" },
+          mango_gin_cocktail: { name: "Mango Gin (Cocktail)", desc: "Kvalitetsgin skakad med len mangopuré och färsk tonic" },
+          gin_tonic: { name: "Gin Tonic", desc: "Klassisk torr gin i symfoni med friskt tonic och lime" },
+          jack_daniels: { name: "Jack Daniels 5 cl.", desc: "Original len sour mash whiskey från Tennessee" }
+        }
+      }
+    };
+
+    // Структурированные данные меню с ценами, Повышенными на 5 крон!
+    const menuData = [
+      {
+        id: "fadøl",
+        items: [
+          { key: "fadol_pilsner", price: 65 },
+          { key: "fadol_classic", price: 65 },
+          { key: "ipa", price: 75 },
+          { key: "mango_gin_fad", price: 95 },
+          { key: "aperol_spritz", price: 85 }
+        ]
+      },
+      {
+        id: "dåse",
+        items: [
+          { key: "somersby", price: 55 },
+          { key: "dase_ol", price: 35 },
+          { key: "alkoholfri", price: 55 }
+        ]
+      },
+      {
+        id: "vin",
+        items: [
+          { key: "vin_flaske", price: 300 },
+          { key: "vin_glas", price: 65 }
+        ]
+      },
+      {
+        id: "kildevand",
+        items: [
+          { key: "kildevand_50", price: 30 },
+          { key: "sodavand", price: 30 }
+        ]
+      },
+      {
+        id: "shots",
+        items: [
+          { key: "shot_2", price: 40 },
+          { key: "underberg_2", price: 40 }
+        ]
+      },
+      {
+        id: "drinks",
+        items: [
+          { key: "cocktail_4", price: 95 },
+          { key: "mango_gin_cocktail", price: 95 },
+          { key: "gin_tonic", price: 95 },
+          { key: "jack_daniels", price: 95 }
+        ]
+      }
+    ];
+
+    // Текущий активный язык
+    let currentLang = 'da';
+
+    // Функция автоопределения языка пользователя
+    function autoDetectLanguage() {
+      // Ищем в localStorage сохраненный язык
+      const saved = localStorage.getItem('demian_kosmach_lang');
+      if (saved && dictionary[saved]) {
+        return { lang: saved, auto: false };
+      }
+
+      // Определяем системный язык
+      const userLangs = navigator.languages || [navigator.language || ''];
+      const supported = Object.keys(dictionary);
+      
+      for (let userLang of userLangs) {
+        if (!userLang) continue;
+        const code = userLang.substring(0, 2).toLowerCase();
+        // Особое сопоставление (например, датский, норвежский, шведский)
+        if (supported.includes(code)) {
+          return { lang: code, auto: true };
+        }
+        // Костылек для Украины (коды могут быть uk или ua)
+        if (code === 'ua') {
+          return { lang: 'uk', auto: true };
+        }
+      }
+      
+      // По дефолту дацкий
+      return { lang: 'da', auto: false };
+    }
+
+    // Инициализация отображения меню
+    function renderMenu() {
+      const container = document.getElementById('menuContainer');
+      container.innerHTML = '';
+      
+      const trans = dictionary[currentLang];
+      const curIcon = trans.currency;
+
+      menuData.forEach((section, sIndex) => {
+        const sectionEl = document.createElement('section');
+        sectionEl.className = 'menu-section';
+        
+        const langCatTitle = trans.categories[section.id] || section.id.toUpperCase();
+
+        let itemsHtml = '';
+        section.items.forEach((item, iIndex) => {
+          const itemTrans = trans.items[item.key] || { name: item.key, desc: '' };
+          // Красивая плавная задержка для анимации элементов
+          const animationDelay = `${(sIndex * 3 + iIndex) * 0.05}s`;
+          
+          itemsHtml += `
+            <div class="menu-item animate-item" style="animation-delay: ${animationDelay}">
+              <div class="menu-item-info">
+                <div class="menu-item-header">
+                  <span class="menu-item-name">${itemTrans.name}</span>
+                  <span class="menu-item-dots"></span>
+                  <span class="menu-item-price">${item.price},-</span>
+                </div>
+                ${itemTrans.desc ? `<span class="menu-item-desc">${itemTrans.desc}</span>` : ''}
+              </div>
+            </div>
+          `;
+        });
+
+        sectionEl.innerHTML = `
+          <div class="menu-section-header">
+            <h2 class="menu-section-title">${langCatTitle}</h2>
+          </div>
+          <div class="menu-section-content">
+            ${itemsHtml}
+          </div>
+        `;
+
+        container.appendChild(sectionEl);
+      });
+
+      // Переводим статические элементы интерфейса
+      document.getElementById('qrModalTitle').textContent = trans.qrTitle;
+      document.getElementById('qrModalSubtitle').textContent = trans.qrSubtitle;
+      document.getElementById('btnPrintText').textContent = trans.btnPrint;
+      document.getElementById('btnDownloadText').textContent = trans.btnDownload;
+      document.getElementById('footerText').textContent = trans.footerCopyright;
+    }
+
+    // Изменение языка в приложении
+    function setLanguage(lang, showNotification = false) {
+      if (!dictionary[lang]) return;
+      currentLang = lang;
+      localStorage.setItem('demian_kosmach_lang', lang);
+
+      // Обновляем выбранное меню dropdown
+      const selectedOption = document.querySelector(`.lang-option[data-lang="${lang}"]`);
+      if (selectedOption) {
+        document.getElementById('selectedFlag').textContent = selectedOption.querySelector('.lang-flag').textContent;
+        document.getElementById('selectedLabel').textContent = selectedOption.textContent.trim().replace(selectedOption.querySelector('.lang-flag').textContent, '').trim();
+        
+        // Помечаем его активным в дропдауне
+        document.querySelectorAll('.lang-option').forEach(opt => opt.classList.remove('active'));
+        selectedOption.classList.add('active');
+      }
+
+      // Переключаем атрибуты страницы
+      document.documentElement.lang = lang;
+
+      // Обновляем меню
+      renderMenu();
+
+      // Показ красивой плашечки авто-определения
+      const alertBox = document.getElementById('autoLangAlert');
+      if (showNotification) {
+        document.getElementById('autoLangMessage').textContent = dictionary[lang].autoLangMsg;
+        alertBox.style.display = 'flex';
+        // Автоматически спрячем плашку через 4 секунды
+        setTimeout(() => {
+          alertBox.style.opacity = '0';
+          setTimeout(() => { alertBox.style.display = 'none'; alertBox.style.opacity = '1'; }, 400);
+        }, 4000);
+      } else {
+        alertBox.style.display = 'none';
+      }
+    }
+
+    // Логика переключателя языков (Dropdown)
+    const langSwitcher = document.getElementById('langSwitcher');
+    const langSelected = document.getElementById('langSelected');
+    const langDropdown = document.getElementById('langDropdown');
+
+    langSelected.addEventListener('click', (e) => {
+      e.stopPropagation();
+      langDropdown.classList.toggle('show');
+      langSelected.classList.toggle('open');
+    });
+
+    document.querySelectorAll('.lang-option').forEach(option => {
+      option.addEventListener('click', (e) => {
+        const lang = option.getAttribute('data-lang');
+        setLanguage(lang, false);
+        langDropdown.classList.remove('show');
+        langSelected.classList.remove('open');
+      });
+    });
+
+    // Закрываем дропдаун при клике вне его
+    document.addEventListener('click', () => {
+      langDropdown.classList.remove('show');
+      langSelected.classList.remove('open');
+    });
+
+    // Логика Модального Окна QR-кода
+    const qrModal = document.getElementById('qrModal');
+    const qrFloatBtn = document.getElementById('qrFloatBtn');
+    const qrCloseBtn = document.getElementById('qrCloseBtn');
+    let qrGeneratorInstance = null;
+
+    function openQRCodeModal() {
+      qrModal.classList.add('show');
+      
+      // Инициализируем генератор QR кодов, если ещё не сделано
+      if (!qrGeneratorInstance) {
+        // Берем текущий URL страницы
+        const siteUrl = window.location.href;
+        
+        qrGeneratorInstance = new QRious({
+          element: document.getElementById('qr-code-canvas'),
+          value: siteUrl,
+          size: 230,
+          background: '#ffffff',
+          foreground: '#000000',
+          level: 'H' // High correction level
+        });
+      }
+    }
+
+    function closeQRCodeModal() {
+      qrModal.classList.remove('show');
+    }
+
+    qrFloatBtn.addEventListener('click', openQRCodeModal);
+    qrCloseBtn.addEventListener('click', closeQRCodeModal);
+    qrModal.addEventListener('click', (e) => {
+      if (e.target === qrModal) {
+        closeQRCodeModal();
+      }
+    });
+
+    // Кнопка Загрузки QR
+    document.getElementById('btnDownloadQR').addEventListener('click', () => {
+      const canvas = document.getElementById('qr-code-canvas');
+      const imageURI = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.download = "demian-kosmach-menu-qr.png";
+      link.href = imageURI;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    // Кнопка Печати QR-постера
+    document.getElementById('btnPrintQR').addEventListener('click', () => {
+      window.print();
+    });
+
+    // Инициализация при загрузке страницы
+    window.addEventListener('DOMContentLoaded', () => {
+      const { lang, auto } = autoDetectLanguage();
+      setLanguage(lang, auto);
+    });
+  </script>
 </body>
 </html>
